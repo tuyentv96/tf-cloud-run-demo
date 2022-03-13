@@ -14,8 +14,15 @@ provider "google" {
   zone    = "asia-southeast1-a"
 }
 
+# Enables the Cloud Run API
+resource "google_project_service" "run_api" {
+  service = "run.googleapis.com"
+
+  disable_on_destroy = true
+}
+
 resource "google_cloud_run_service" "default" {
-  name     = "cloudrun-srv"
+  name     = "cloudrun-hello-app"
   location = "asia-southeast1"
 
   template {
