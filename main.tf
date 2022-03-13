@@ -9,44 +9,39 @@ terraform {
 }
 
 provider "google" {
-  project = var.GCP_PROJECT_ID
-  region  = "asia-southeast1"
-  zone    = "asia-southeast1-a"
-}
-
-# Enables the Cloud Run API
-resource "google_project_service" "run_api" {
-  service = "run.googleapis.com"
-  project = var.GCP_PROJECT_ID
-  disable_on_destroy = true
+    project = var.GCP_PROJECT_ID
 }
 
 resource "google_cloud_run_service" "default" {
-  name     = "cloudrun-hello-app"
-  location = "asia-southeast1"
+    name     = var.AppName
+    location = var.Location
 
-  template {
-    spec {
-      containers {
-        image = "us-docker.pkg.dev/cloudrun/container/hello"
+    metadata {
+      annotations = {
+        "run.googleapis.com/client-name" = "terraform"
       }
     }
-  }
-}
 
-data "google_iam_policy" "noauth" {
-  binding {
-    role = "roles/run.invoker"
-    members = [
-      "allUsers",
-    ]
-  }
-}
+    template {
+      spec {
+        containers {
+          image = "us-docker.pkg.dev/cloudrun/container/hello"
+        }
+      }
+    }
+ }
 
-resource "google_cloud_run_service_iam_policy" "noauth" {
-  location    = google_cloud_run_service.default.location
-  project     = google_cloud_run_service.default.project
-  service     = google_cloud_run_service.default.name
+ data "google_iam_policy" "noauth" {
+   binding {
+     role = "roles/run.invoker"
+     members = ["allUsers"]
+   }
+ }
 
-  policy_data = data.google_iam_policy.noauth.policy_data
+ resource "google_cloud_run_service_iam_policy" "noauth" {
+   location    = google_cloud_run_service.default.location
+   project     = google_cloud_run_service.default.project
+   service     = google_cloud_run_service.default.name
+
+   policy_data = data.google_iam_policy.noauth.policy_data
 }
