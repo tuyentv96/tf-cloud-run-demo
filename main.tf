@@ -17,7 +17,7 @@ provider "google" {
 # Enables the Cloud Run API
 resource "google_project_service" "run_api" {
   service = "run.googleapis.com"
-
+  project = var.GCP_PROJECT_ID
   disable_on_destroy = true
 }
 
