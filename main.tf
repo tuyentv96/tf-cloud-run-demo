@@ -16,7 +16,7 @@ provider "google" {
 
 resource "google_cloud_run_service" "default" {
   name     = "cloudrun-srv"
-  location = "us-central1"
+  location = "asia-southeast1"
 
   template {
     spec {
